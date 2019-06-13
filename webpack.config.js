@@ -1,6 +1,8 @@
 const path = require('path');
 const VueLoaderPlugin = require('vue-loader/lib/plugin');
 const HtmlWebpackplugin = require('html-webpack-plugin');
+const webpack = require('webpack');
+const constant = require('./config/constant'); // 引入常量文件
 module.exports = {
     mode: 'development',// 指定开发者打包模式
     entry : './src/main.js',//入口文件
@@ -80,7 +82,10 @@ module.exports = {
             filename: 'index.html', // 打包后的文件名，默认是index.html
             template: path.resolve(__dirname, 'index.html') // 导入被打包的文件模板
         }),
-        new VueLoaderPlugin()
+        new VueLoaderPlugin(),
+        new webpack.DefinePlugin({ // 定义全局变量
+          CONSTANT: JSON.stringify(constant)
+        })
     ],
     devServer: { //node本地服务器
         host: '127.0.0.1',
