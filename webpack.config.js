@@ -1,4 +1,5 @@
 const path = require('path');
+const VueLoaderPlugin = require('vue-loader/lib/plugin');
 const HtmlWebpackplugin = require('html-webpack-plugin');
 module.exports = {
     mode: 'development',// 指定开发者打包模式
@@ -19,11 +20,70 @@ module.exports = {
                     }
                   }
             },
+            {
+                test: /\.vue$/,
+                use: [
+                  {
+                    loader: 'cache-loader'
+                  },
+                  {
+                    loader: 'thread-loader'
+                  },
+                  {
+                    loader: 'vue-loader',
+                    options: {
+                      compilerOptions: {
+                        preserveWhitespace: false
+                      },
+                    }
+                  },
+                ]
+            },
+            {
+                test: /\.(scss|sass)$/,
+                use: [
+                    {
+                        loader: 'style-loader'
+                    },
+                    {
+                        loader: 'css-loader'
+                    },
+                    {
+                        loader: 'sass-loader',
+                        options: {
+                            implementation: require('dart-sass')
+                        }
+                    },
+                    {
+                        loader: 'postcss-loader',
+                        options: {
+                            plugins: [
+                                require("autoprefixer") /*自动添加前缀*/
+                            ]
+                        }
+                    }
+                ]
+            },
+            {
+                test: /\.(png|jpg|jpeg|gif|eot|ttf|woff|woff2|svg|svgz)(\?.+)?$/,
+                use: [{
+                  loader: 'url-loader',
+                  options: {
+                    limit: 10000
+                  }
+                }]
+            }
         ]
     },
     plugins:[
         new HtmlWebpackplugin({
-            template: path.resolve(__dirname, 'index.html')
-        })
-    ]
+            filename: 'index.html', // 打包后的文件名，默认是index.html
+            template: path.resolve(__dirname, 'index.html') // 导入被打包的文件模板
+        }),
+        new VueLoaderPlugin()
+    ],
+    devServer: { //node本地服务器
+        host: '127.0.0.1',
+        port: 8010
+    },
 }
