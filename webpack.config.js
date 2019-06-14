@@ -4,13 +4,13 @@ const HtmlWebpackplugin = require('html-webpack-plugin');
 const webpack = require('webpack');
 const constant = require('./config/constant'); // 引入常量文件
 module.exports = {
-    mode: 'development',// 指定开发者打包模式
     entry : './src/main.js',//入口文件
     output : {//输出文件
         filename : 'index.js',//输出文件名
-        path :  __dirname+'/public'//输出文件路径
+        path :  __dirname+'/public',//输出文件路径
+        // publicPath: "public", // 虚拟目录，自动指向path编译目录，放在内存中，所以在硬盘上是找不到的 默认是：/
     },
-    module : {
+    module : { // 当执行require或import命令时匹配下面的加载规则
         rules: [
             {/*将js或者jsx文件转码成es5*/
                 test: /\.jsx?$/,// 正则惰性匹配后缀名为js或者jsx的文件
@@ -22,7 +22,7 @@ module.exports = {
                     }
                   }
             },
-            {
+            { // vue文件处理
                 test: /\.vue$/,
                 use: [
                   {
@@ -41,38 +41,24 @@ module.exports = {
                   },
                 ]
             },
-            {
-                test: /\.(scss|sass)$/,
-                use: [
-                    {
-                        loader: 'style-loader'
-                    },
-                    {
-                        loader: 'css-loader'
-                    },
-                    {
-                        loader: 'sass-loader',
-                        options: {
-                            implementation: require('dart-sass')
-                        }
-                    },
-                    {
-                        loader: 'postcss-loader',
-                        options: {
-                            plugins: [
-                                require("autoprefixer") /*自动添加前缀*/
-                            ]
-                        }
-                    }
-                ]
-            },
-            {
-                test: /\.(png|jpg|jpeg|gif|eot|ttf|woff|woff2|svg|svgz)(\?.+)?$/,
+            // { // 文件资源加载 变成base64会跟下面图片资源处理冲突所以注释了
+            //     test: /\.(png|jpg|jpeg|gif|eot|ttf|woff|woff2|svg|svgz)(\?.+)?$/,
+            //     use: [{
+            //       loader: 'url-loader',
+            //       options: {
+            //           name: '[name].[ext]'
+            //       }
+            //     }]
+            // },
+            { // 图片资源处理
+                test: /\.(png|jpg|gif|svg)/,
                 use: [{
-                  loader: 'url-loader',
-                  options: {
-                    limit: 10000
-                  }
+                    loader: "file-loader",
+                    options: {
+                        name: '[name].[ext]',
+                        outputPath: "public/assets/", // 输出目录
+                        limit: 8192,
+                    }
                 }]
             }
         ]
@@ -87,8 +73,4 @@ module.exports = {
           CONSTANT: JSON.stringify(constant)
         })
     ],
-    devServer: { //node本地服务器
-        host: '127.0.0.1',
-        port: 8010
-    },
 }
